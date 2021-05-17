@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import com.github.springlink.basic.core.RootEntitySupport;
 
@@ -23,13 +24,17 @@ public class AccountToken extends RootEntitySupport {
 	private String id;
 
 	private String userId;
+	
+	@Lob
+	private String data;
 
 	private LocalDateTime expiresAt;
 
-	public AccountToken(String userId, Duration ttl) {
+	public AccountToken(String userId, Duration ttl, String data) {
 		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.userId = userId;
 		this.expiresAt = LocalDateTime.now().plus(ttl);
+		this.data = data;
 	}
 	
 	public boolean isValidNow() {

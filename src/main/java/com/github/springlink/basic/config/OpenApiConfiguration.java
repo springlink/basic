@@ -34,7 +34,7 @@ public class OpenApiConfiguration {
 		PathMatcher matcher = new AntPathMatcher();
 		return c -> {
 			c.getPaths().forEach((path, item) -> {
-				if (matcher.match("/api/public/**", path)) {
+				if (matcher.match("/api/account/auth/login", path)) {
 					return;
 				}
 				if (matcher.match("/api/**", path)) {

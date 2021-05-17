@@ -1,4 +1,4 @@
-package com.github.springlink.basic.api;
+package com.github.springlink.basic.module.sys.api;
 
 import javax.validation.Valid;
 
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/account")
 @RequiredArgsConstructor
-public class AccountApi {
+public class AccountController {
 	private final AccountService accountService;
 
 	@Operation(summary = "Add account")

@@ -1,5 +1,7 @@
 package com.github.springlink.basic.module.sys.service;
 
+import java.util.Collections;
+
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -8,11 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.springlink.basic.core.ApplicationException;
+import com.github.springlink.basic.module.sys.dao.AccountRepository;
 import com.github.springlink.basic.module.sys.domain.Account;
 import com.github.springlink.basic.module.sys.dto.AccountAdd;
 import com.github.springlink.basic.module.sys.dto.AccountChangeProfile;
 import com.github.springlink.basic.module.sys.dto.AccountReply;
-import com.github.springlink.basic.module.sys.repository.AccountRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +28,7 @@ public class AccountService {
 	@EventListener
 	public void onContextRefreshed(ContextRefreshedEvent event) {
 		if (!accountRepository.findByUsernameAndDeletedFalse("root").isPresent()) {
-			Account account = new Account("root", "123456", null, null);
+			Account account = new Account("root", "123456", null, null, Collections.emptySet());
 			accountRepository.save(account);
 		}
 	}

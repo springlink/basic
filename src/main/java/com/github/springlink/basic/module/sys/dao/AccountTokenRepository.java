@@ -1,4 +1,4 @@
-package com.github.springlink.basic.module.sys.repository;
+package com.github.springlink.basic.module.sys.dao;
 
 import org.springframework.data.repository.CrudRepository;
 

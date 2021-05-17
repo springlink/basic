@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, info } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -31,15 +31,18 @@ const mutations = {
   }
 }
 
+function commitInfo(commit, { userId, username, permissions }) {
+  
+}
+
 const actions = {
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login({ username: username.trim(), password: password }).then(res => {
+        commit('SET_TOKEN', res.token)
+        setToken(res.token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -48,26 +51,19 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  info({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
-        if (!data) {
-          reject('Verification failed, please Login again.')
+      info().then(res => {
+        const auth = {
+          name: res.username,
+          roles: res.permissions,
+          avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+          introduction: '',
         }
-
-        const { roles, name, avatar } = data
-
-        // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
-        }
-
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
+        commit('SET_ROLES', auth.roles)
+        commit('SET_NAME', auth.name)
+        commit('SET_AVATAR', auth.avatar)
+        resolve(auth)
       }).catch(error => {
         reject(error)
       })
@@ -77,7 +73,7 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      logout().then(() => {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')

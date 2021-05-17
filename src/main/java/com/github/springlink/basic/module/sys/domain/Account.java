@@ -1,14 +1,21 @@
 package com.github.springlink.basic.module.sys.domain;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.github.springlink.basic.core.RootEntitySupport;
+import com.google.common.collect.Sets;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,22 +40,28 @@ public class Account extends RootEntitySupport {
 	private String phoneNumber;
 
 	private String email;
-	
+
 	private Boolean deleted;
 
-	public Account(String username, String password, String phoneNumber, String email) {
+	@ElementCollection
+	@CollectionTable(name = "account_roles", joinColumns = @JoinColumn(name = "account_id"))
+	@Column(name = "role_id")
+	private Set<String> roleIds = Sets.newHashSet();
+
+	public Account(String username, String password, String phoneNumber, String email, Collection<String> roleIds) {
 		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.username = username;
 		this.password = passwordEncoder.encode(password);
 		this.phoneNumber = phoneNumber;
 		this.email = email;
 		this.deleted = false;
+		this.roleIds.addAll(roleIds);
 	}
 
 	public boolean passwordMatches(String raw) {
 		return passwordEncoder.matches(raw, password);
 	}
-	
+
 	public void markDeleted() {
 		this.deleted = true;
 	}

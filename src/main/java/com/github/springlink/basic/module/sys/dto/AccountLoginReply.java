@@ -6,14 +6,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "Account login reply")
+@Schema(description = "账号登录")
 public class AccountLoginReply {
-	@Schema(description = "User ID")
-	private String userId;
-
-	@Schema(description = "Token")
+	@Schema(description = "令牌")
 	private String token;
 
-	@Schema(description = "Token expires time")
+	@Schema(description = "令牌过期时间")
 	private LocalDateTime expiresAt;
+
+	@Schema(description = "账号授权信息")
+	private AccountAuth auth;
 }
