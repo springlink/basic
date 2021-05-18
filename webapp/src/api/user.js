@@ -1,23 +1,9 @@
 import request from '@/utils/request'
 
-export function login(data) {
+export function page(page, size) {
   return request({
-    url: '/user/auth/login',
-    method: 'post',
-    data
-  })
-}
-
-export function info() {
-  return request({
-    url: '/user/auth/info',
-    method: 'get'
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/user/auth/logout',
-    method: 'post'
+    url: '/user/page',
+    method: 'get',
+    params: { page, size }
   })
 }

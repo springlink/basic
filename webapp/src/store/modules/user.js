@@ -1,4 +1,4 @@
-import { login, logout, info } from '@/api/user'
+import { login, logout, info } from '@/api/auth'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -31,10 +31,6 @@ const mutations = {
   }
 }
 
-function commitInfo(commit, { userId, username, permissions }) {
-  
-}
-
 const actions = {
   // user login
   login({ commit }, userInfo) {
@@ -57,8 +53,7 @@ const actions = {
         const auth = {
           name: res.username,
           roles: res.permissions,
-          avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-          introduction: '',
+          avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'
         }
         commit('SET_ROLES', auth.roles)
         commit('SET_NAME', auth.name)
