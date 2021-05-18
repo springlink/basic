@@ -19,48 +19,48 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springlink.basic.core.ApplicationException;
-import com.github.springlink.basic.module.sys.dao.AccountRepository;
-import com.github.springlink.basic.module.sys.dao.AccountTokenRepository;
 import com.github.springlink.basic.module.sys.dao.RoleRepository;
-import com.github.springlink.basic.module.sys.domain.Account;
-import com.github.springlink.basic.module.sys.domain.AccountToken;
-import com.github.springlink.basic.module.sys.dto.AccountAuth;
-import com.github.springlink.basic.module.sys.dto.AccountLogin;
-import com.github.springlink.basic.module.sys.dto.AccountLoginReply;
+import com.github.springlink.basic.module.sys.dao.UserRepository;
+import com.github.springlink.basic.module.sys.dao.UserTokenRepository;
+import com.github.springlink.basic.module.sys.domain.User;
+import com.github.springlink.basic.module.sys.domain.UserToken;
+import com.github.springlink.basic.module.sys.dto.UserAuth;
+import com.github.springlink.basic.module.sys.dto.UserLogin;
+import com.github.springlink.basic.module.sys.dto.UserLoginReply;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AccountTokenService implements OpaqueTokenIntrospector {
-	private final AccountMapper accountMapper;
-	private final AccountRepository accountRepository;
-	private final AccountTokenRepository accountTokenRepository;
+public class UserTokenService implements OpaqueTokenIntrospector {
+	private final UserMapper userMapper;
+	private final UserRepository userRepository;
+	private final UserTokenRepository userTokenRepository;
 	private final RoleRepository roleRepository;
 	private final ObjectMapper objectMapper;
 
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
-		AccountToken accountToken = accountTokenRepository.findById(token)
-				.filter(AccountToken::isValidNow)
+		UserToken userToken = userTokenRepository.findById(token)
+				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new OAuth2IntrospectionException("invalid token"));
 
-		AccountAuth authReply;
+		UserAuth userAuth;
 		try {
-			authReply = objectMapper.readValue(accountToken.getData(), AccountAuth.class);
+			userAuth = objectMapper.readValue(userToken.getData(), UserAuth.class);
 		} catch (JsonProcessingException e) {
 			throw new OAuth2IntrospectionException("IO error");
 		}
 
 		Map<String, Object> attributes = Maps.newHashMap();
-		attributes.put(OAuth2IntrospectionClaimNames.SUBJECT, authReply.getUserId());
+		attributes.put(OAuth2IntrospectionClaimNames.SUBJECT, userAuth.getUserId());
 		attributes.put(OAuth2IntrospectionClaimNames.ISSUED_AT,
-				accountToken.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant());
+				userToken.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant());
 		attributes.put(OAuth2IntrospectionClaimNames.EXPIRES_AT,
-				accountToken.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
+				userToken.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
 
-		List<GrantedAuthority> authorities = authReply
+		List<GrantedAuthority> authorities = userAuth
 				.getPermissions()
 				.stream()
 				.map(SimpleGrantedAuthority::new)
@@ -70,41 +70,40 @@ public class AccountTokenService implements OpaqueTokenIntrospector {
 	}
 
 	@Transactional
-	public AccountLoginReply login(AccountLogin login) {
-		Account account = accountRepository.findByUsernameAndDeletedFalse(login.getUsername())
+	public UserLoginReply login(UserLogin userLogin) {
+		User user = userRepository.findByUsernameAndDeletedFalse(userLogin.getUsername())
 				.orElseThrow(() -> new ApplicationException("INCORRECT_LOGIN_INFO"));
-		if (!account.passwordMatches(login.getPassword())) {
+		if (!user.passwordMatches(userLogin.getPassword())) {
 			throw new ApplicationException("INCORRECT_LOGIN_INFO");
 		}
 
-		AccountAuth authReply = accountMapper.entityToAuthReply(account);
-		authReply.setPermissions(roleRepository
-				.findAllByIdInAndDeletedFalse(account.getRoleIds())
+		UserAuth userAuth = userMapper.entityToAuth(user);
+		userAuth.setPermissions(roleRepository
+				.findAllByIdInAndDeletedFalse(user.getRoleIds())
 				.stream()
 				.flatMap(r -> r.getPermissions().stream())
 				.collect(Collectors.toSet()));
 
-		AccountToken accountToken;
+		UserToken userToken;
 		try {
-			accountToken = new AccountToken(account.getId(), Duration.ofHours(1),
-					objectMapper.writeValueAsString(authReply));
+			userToken = userTokenRepository.save(
+					new UserToken(user.getId(), Duration.ofHours(1),
+							objectMapper.writeValueAsString(userAuth)));
 		} catch (JsonProcessingException e) {
 			throw new ApplicationException("IO_ERROR");
 		}
 
-		accountTokenRepository.save(accountToken);
-
-		AccountLoginReply loginReply = accountMapper.tokenToLoginReply(accountToken);
-		loginReply.setAuth(authReply);
-		return loginReply;
+		UserLoginReply userLoginReply = userMapper.tokenToLoginReply(userToken);
+		userLoginReply.setAuth(userAuth);
+		return userLoginReply;
 	}
 
-	public AccountAuth getAuthByToken(String token) {
-		AccountToken accountToken = accountTokenRepository.findById(token)
-				.filter(AccountToken::isValidNow)
+	public UserAuth getAuthByToken(String token) {
+		UserToken userToken = userTokenRepository.findById(token)
+				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new ApplicationException("INVALID_TOKEN"));
 		try {
-			return objectMapper.readValue(accountToken.getData(), AccountAuth.class);
+			return objectMapper.readValue(userToken.getData(), UserAuth.class);
 		} catch (JsonProcessingException e) {
 			throw new ApplicationException("IO_ERROR");
 		}

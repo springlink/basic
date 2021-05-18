@@ -9,33 +9,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.springlink.basic.module.sys.dto.AccountAuth;
-import com.github.springlink.basic.module.sys.dto.AccountLogin;
-import com.github.springlink.basic.module.sys.dto.AccountLoginReply;
-import com.github.springlink.basic.module.sys.service.AccountTokenService;
+import com.github.springlink.basic.module.sys.dto.UserAuth;
+import com.github.springlink.basic.module.sys.dto.UserLogin;
+import com.github.springlink.basic.module.sys.dto.UserLoginReply;
+import com.github.springlink.basic.module.sys.service.UserTokenService;
 import com.github.springlink.basic.util.SecurityUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "public")
+@Tag(name = "用户授权")
 @RestController
-@RequestMapping("/api/account/auth")
+@RequestMapping("/api/user/auth")
 @RequiredArgsConstructor
-public class AccountAuthController {
-	private final AccountTokenService accountTokenService;
+public class UserAuthController {
+	private final UserTokenService userTokenService;
 
 	@Operation(summary = "登录")
 	@PostMapping("/login")
-	public AccountLoginReply login(@RequestBody @Valid AccountLogin req) {
-		return accountTokenService.login(req);
+	public UserLoginReply login(@RequestBody @Valid UserLogin body) {
+		return userTokenService.login(body);
 	}
 
 	@Operation(summary = "授权信息")
 	@GetMapping("/info")
-	public AccountAuth info() {
-		return accountTokenService.getAuthByToken(SecurityUtils.currentToken().get().getTokenValue());
+	public UserAuth info() {
+		return userTokenService.getAuthByToken(SecurityUtils.currentToken().get().getTokenValue());
 	}
 
 	@Operation(summary = "注销")

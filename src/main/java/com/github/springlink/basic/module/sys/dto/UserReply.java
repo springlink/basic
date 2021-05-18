@@ -6,20 +6,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "Account reply")
-public class AccountReply {
-	@Schema(description = "Account ID")
+@Schema(description = "用户信息")
+public class UserReply {
+	@Schema(description = "用户ID")
 	private String id;
 
-	@Schema(description = "Username")
+	@Schema(description = "用户名")
 	private String username;
 
-	@Schema(description = "Phone number")
+	@Schema(description = "电话号码")
 	private String phoneNumber;
 
 	@Schema(description = "Email")
 	private String email;
 
-	@Schema(description = "Created date")
+	@Schema(description = "创建日期")
 	private LocalDateTime createdDate;
 }

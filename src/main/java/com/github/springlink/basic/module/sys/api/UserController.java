@@ -12,43 +12,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.springlink.basic.module.sys.dto.AccountAdd;
-import com.github.springlink.basic.module.sys.dto.AccountChangeProfile;
-import com.github.springlink.basic.module.sys.dto.AccountReply;
-import com.github.springlink.basic.module.sys.service.AccountService;
+import com.github.springlink.basic.module.sys.dto.UserAdd;
+import com.github.springlink.basic.module.sys.dto.UserChangeProfile;
+import com.github.springlink.basic.module.sys.dto.UserReply;
+import com.github.springlink.basic.module.sys.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "account")
+@Tag(name = "用户管理")
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
-public class AccountController {
-	private final AccountService accountService;
+public class UserController {
+	private final UserService userService;
 
-	@Operation(summary = "Add account")
+	@Operation(summary = "添加用户")
 	@PostMapping("/add")
-	public AccountReply add(@RequestBody @Valid AccountAdd body) {
-		return accountService.add(body);
+	public UserReply add(@RequestBody @Valid UserAdd body) {
+		return userService.add(body);
 	}
 
-	@Operation(summary = "Change profile")
+	@Operation(summary = "修改资料")
 	@PostMapping("/changeProfile")
-	public void changeProfile(@RequestBody @Valid AccountChangeProfile body) {
-		accountService.changeProfile(body);
+	public void changeProfile(@RequestBody @Valid UserChangeProfile body) {
+		userService.changeProfile(body);
 	}
 
-	@Operation(summary = "Delete account")
+	@Operation(summary = "删除用户")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable("id") String id) {
-		accountService.delete(id);
+		userService.delete(id);
 	}
 
-	@Operation(summary = "List accounts")
+	@Operation(summary = "用户列表")
 	@GetMapping("/page")
-	public Page<AccountReply> list(Pageable pageable) {
-		return accountService.page(pageable);
+	public Page<UserReply> list(Pageable pageable) {
+		return userService.page(pageable);
 	}
 }

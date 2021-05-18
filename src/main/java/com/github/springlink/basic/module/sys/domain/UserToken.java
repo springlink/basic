@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AccountToken extends RootEntitySupport {
+public class UserToken extends RootEntitySupport {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -30,7 +30,7 @@ public class AccountToken extends RootEntitySupport {
 
 	private LocalDateTime expiresAt;
 
-	public AccountToken(String userId, Duration ttl, String data) {
+	public UserToken(String userId, Duration ttl, String data) {
 		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.userId = userId;
 		this.expiresAt = LocalDateTime.now().plus(ttl);

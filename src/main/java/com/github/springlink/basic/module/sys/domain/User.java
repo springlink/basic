@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account extends RootEntitySupport {
+public class User extends RootEntitySupport {
 	private static final long serialVersionUID = 1L;
 
 	@Transient
@@ -44,11 +44,11 @@ public class Account extends RootEntitySupport {
 	private Boolean deleted;
 
 	@ElementCollection
-	@CollectionTable(name = "account_roles", joinColumns = @JoinColumn(name = "account_id"))
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "role_id")
 	private Set<String> roleIds = Sets.newHashSet();
 
-	public Account(String username, String password, String phoneNumber, String email, Collection<String> roleIds) {
+	public User(String username, String password, String phoneNumber, String email, Collection<String> roleIds) {
 		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.username = username;
 		this.password = passwordEncoder.encode(password);

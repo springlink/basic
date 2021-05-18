@@ -25,7 +25,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.oauth2ResourceServer()
 				.opaqueToken();
 		http.authorizeRequests()
-				.antMatchers("/api/account/auth/login").permitAll()
+				.antMatchers("/api/user/auth/login").permitAll()
 				.antMatchers("/api/**").authenticated()
 				.anyRequest().permitAll();
 	}
