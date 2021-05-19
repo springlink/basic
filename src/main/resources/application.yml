@@ -1,9 +1,10 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: 
+    url: jdbc:mysql://localhost/basic_db
+    username: root
+    password: 123456
+  jpa:    hibernate:      ddl-auto: update
   data:
     web:
       pageable:
-        one-indexed-parameters: true  h2:    console:      enabled: true
+        one-indexed-parameters: true

@@ -28,7 +28,7 @@ public class Role extends RootEntitySupport {
 
 	private String name;
 
-	private Boolean deleted;
+	private boolean deleted;
 
 	@ElementCollection
 	@CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))

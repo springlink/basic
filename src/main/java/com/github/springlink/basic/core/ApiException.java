@@ -2,27 +2,27 @@ package com.github.springlink.basic.core;
 
 import lombok.Getter;
 
-public class ApplicationException extends RuntimeException {
+public class ApiException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	@Getter
 	private final String code;
 
-	public ApplicationException(String code) {
+	public ApiException(String code) {
 		this.code = code;
 	}
 
-	public ApplicationException(String code, String message, Throwable cause) {
+	public ApiException(String code, String message, Throwable cause) {
 		super(message, cause);
 		this.code = code;
 	}
 
-	public ApplicationException(String code, String message) {
+	public ApiException(String code, String message) {
 		super(message);
 		this.code = code;
 	}
 
-	public ApplicationException(String code, Throwable cause) {
+	public ApiException(String code, Throwable cause) {
 		super(cause);
 		this.code = code;
 	}

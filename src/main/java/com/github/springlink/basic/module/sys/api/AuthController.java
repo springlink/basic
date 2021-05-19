@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.springlink.basic.module.sys.dto.UserAuth;
 import com.github.springlink.basic.module.sys.dto.UserLogin;
 import com.github.springlink.basic.module.sys.dto.UserLoginReply;
-import com.github.springlink.basic.module.sys.service.UserTokenService;
+import com.github.springlink.basic.module.sys.service.TokenService;
 import com.github.springlink.basic.util.SecurityUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,21 +21,21 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "用户授权")
 @RestController
-@RequestMapping("/api/user/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class UserAuthController {
-	private final UserTokenService userTokenService;
+public class AuthController {
+	private final TokenService tokenService;
 
 	@Operation(summary = "登录")
 	@PostMapping("/login")
 	public UserLoginReply login(@RequestBody @Valid UserLogin body) {
-		return userTokenService.login(body);
+		return tokenService.login(body);
 	}
 
 	@Operation(summary = "授权信息")
 	@GetMapping("/info")
 	public UserAuth info() {
-		return userTokenService.getAuthByToken(SecurityUtils.currentToken().get().getTokenValue());
+		return tokenService.getAuthByToken(SecurityUtils.getCurrentToken().get().getTokenValue());
 	}
 
 	@Operation(summary = "注销")

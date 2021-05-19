@@ -6,15 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "用户修改资料")
-public class UserChangeProfile {
+@Schema(description = "用户修改密码")
+public class UserSetPassword {
 	@NotEmpty
 	@Schema(description = "用户ID")
 	private String id;
 
-	@Schema(description = "电话号码")
-	private String phoneNumber;
-
-	@Schema(description = "Email")
-	private String email;
+	@NotEmpty
+	@Schema(description = "新密码")
+	private String password;
 }

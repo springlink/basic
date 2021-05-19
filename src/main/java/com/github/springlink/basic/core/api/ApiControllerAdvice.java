@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.github.springlink.basic.BasicApplication;
-import com.github.springlink.basic.core.ApplicationException;
+import com.github.springlink.basic.core.ApiException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,9 +54,9 @@ public class ApiControllerAdvice implements ResponseBodyAdvice<Object> {
 	}
 
 	@ResponseBody
-	@ExceptionHandler(ApplicationException.class)
+	@ExceptionHandler(ApiException.class)
 	@ResponseStatus(HttpStatus.OK)
-	public Object handleEtyException(ApplicationException ex) {
+	public Object handleEtyException(ApiException ex) {
 		log.debug(ex.getMessage(), ex);
 		return ApiResult.error(ex.getCode(), ex.getMessage());
 	}

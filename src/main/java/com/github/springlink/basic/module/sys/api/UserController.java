@@ -5,7 +5,6 @@ import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.springlink.basic.module.sys.dto.UserAdd;
-import com.github.springlink.basic.module.sys.dto.UserChangeProfile;
+import com.github.springlink.basic.module.sys.dto.UserQuery;
 import com.github.springlink.basic.module.sys.dto.UserReply;
+import com.github.springlink.basic.module.sys.dto.UserSetLocked;
+import com.github.springlink.basic.module.sys.dto.UserSetPassword;
+import com.github.springlink.basic.module.sys.dto.UserSetProfile;
 import com.github.springlink.basic.module.sys.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,20 +37,32 @@ public class UserController {
 	}
 
 	@Operation(summary = "修改资料")
-	@PostMapping("/changeProfile")
-	public void changeProfile(@RequestBody @Valid UserChangeProfile body) {
-		userService.changeProfile(body);
+	@PostMapping("/setProfile")
+	public void setProfile(@RequestBody @Valid UserSetProfile body) {
+		userService.setProfile(body);
+	}
+
+	@Operation(summary = "修改密码")
+	@PostMapping("/setPassword")
+	public void setPassword(@RequestBody @Valid UserSetPassword body) {
+		userService.setPassword(body);
+	}
+
+	@Operation(summary = "修改锁定状态")
+	@PostMapping("/setLocked")
+	public void setLocked(@RequestBody @Valid UserSetLocked body) {
+		userService.setLocked(body);
 	}
 
 	@Operation(summary = "删除用户")
-	@DeleteMapping("/delete/{id}")
-	public void delete(@PathVariable("id") String id) {
+	@DeleteMapping("/remove/{id}")
+	public void remove(@PathVariable("id") String id) {
 		userService.delete(id);
 	}
 
 	@Operation(summary = "用户列表")
-	@GetMapping("/page")
-	public Page<UserReply> list(Pageable pageable) {
-		return userService.page(pageable);
+	@PostMapping("/page")
+	public Page<UserReply> list(@RequestBody @Valid UserQuery body, Pageable pageable) {
+		return userService.page(body, pageable);
 	}
 }

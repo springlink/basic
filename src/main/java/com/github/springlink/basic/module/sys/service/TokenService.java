@@ -1,6 +1,7 @@
 package com.github.springlink.basic.module.sys.service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.springlink.basic.core.ApplicationException;
+import com.github.springlink.basic.core.ApiException;
 import com.github.springlink.basic.module.sys.dao.RoleRepository;
 import com.github.springlink.basic.module.sys.dao.UserRepository;
-import com.github.springlink.basic.module.sys.dao.UserTokenRepository;
+import com.github.springlink.basic.module.sys.dao.TokenRepository;
 import com.github.springlink.basic.module.sys.domain.User;
-import com.github.springlink.basic.module.sys.domain.UserToken;
+import com.github.springlink.basic.module.sys.domain.Token;
 import com.github.springlink.basic.module.sys.dto.UserAuth;
 import com.github.springlink.basic.module.sys.dto.UserLogin;
 import com.github.springlink.basic.module.sys.dto.UserLoginReply;
@@ -33,19 +34,22 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserTokenService implements OpaqueTokenIntrospector {
+public class TokenService implements OpaqueTokenIntrospector {
 	private final UserMapper userMapper;
 	private final UserRepository userRepository;
-	private final UserTokenRepository userTokenRepository;
+	private final TokenRepository tokenRepository;
 	private final RoleRepository roleRepository;
 	private final ObjectMapper objectMapper;
 
+	@Transactional
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
-		UserToken userToken = userTokenRepository.findById(token)
-				.filter(UserToken::isValidNow)
+		Token userToken = tokenRepository.findById(token)
+				.filter(Token::isValidNow)
 				.orElseThrow(() -> new OAuth2IntrospectionException("invalid token"));
-
+		
+		userToken.touch(LocalDateTime.now().plus(Duration.ofMinutes(30)));
+		
 		UserAuth userAuth;
 		try {
 			userAuth = objectMapper.readValue(userToken.getData(), UserAuth.class);
@@ -72,9 +76,12 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 	@Transactional
 	public UserLoginReply login(UserLogin userLogin) {
 		User user = userRepository.findByUsernameAndDeletedFalse(userLogin.getUsername())
-				.orElseThrow(() -> new ApplicationException("INCORRECT_LOGIN_INFO"));
+				.orElseThrow(() -> new ApiException("INCORRECT_LOGIN_INFO"));
 		if (!user.passwordMatches(userLogin.getPassword())) {
-			throw new ApplicationException("INCORRECT_LOGIN_INFO");
+			throw new ApiException("INCORRECT_LOGIN_INFO");
+		}
+		if (user.isLocked()) {
+			throw new ApiException("USER_LOCKED");
 		}
 
 		UserAuth userAuth = userMapper.entityToAuth(user);
@@ -84,13 +91,13 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 				.flatMap(r -> r.getPermissions().stream())
 				.collect(Collectors.toSet()));
 
-		UserToken userToken;
+		Token userToken;
 		try {
-			userToken = userTokenRepository.save(
-					new UserToken(user.getId(), Duration.ofHours(1),
+			userToken = tokenRepository.save(
+					new Token(user.getId(), Duration.ofHours(1),
 							objectMapper.writeValueAsString(userAuth)));
 		} catch (JsonProcessingException e) {
-			throw new ApplicationException("IO_ERROR");
+			throw new ApiException("IO_ERROR");
 		}
 
 		UserLoginReply userLoginReply = userMapper.tokenToLoginReply(userToken);
@@ -99,13 +106,13 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 	}
 
 	public UserAuth getAuthByToken(String token) {
-		UserToken userToken = userTokenRepository.findById(token)
-				.filter(UserToken::isValidNow)
-				.orElseThrow(() -> new ApplicationException("INVALID_TOKEN"));
+		Token userToken = tokenRepository.findById(token)
+				.filter(Token::isValidNow)
+				.orElseThrow(() -> new ApiException("INVALID_TOKEN"));
 		try {
 			return objectMapper.readValue(userToken.getData(), UserAuth.class);
 		} catch (JsonProcessingException e) {
-			throw new ApplicationException("IO_ERROR");
+			throw new ApiException("IO_ERROR");
 		}
 	}
 }

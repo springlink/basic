@@ -146,3 +146,11 @@ export function removeClass(ele, cls) {
     ele.className = ele.className.replace(reg, ' ')
   }
 }
+
+export function makePageParams({ page, limit, prop, order }) {
+  return {
+    page: page || 1,
+    size: limit || 10,
+    sort: prop ? `${prop},${order === 'descending' ? 'desc' : 'asc'}` : null
+  }
+}

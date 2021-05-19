@@ -1,11 +1,14 @@
 package com.github.springlink.basic.config;
 
 import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
@@ -17,9 +20,13 @@ public class JacksonConfiguration {
 	@Bean
 	public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
 		return builder -> {
-			builder.simpleDateFormat(DATE_TIME_FORMAT);
-			builder.serializers(new LocalDateSerializer(DateTimeFormatter.ofPattern(DATE_FORMAT)));
-			builder.serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)));
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+			builder.timeZone(TimeZone.getDefault());
+			builder.deserializers(new LocalDateDeserializer(dateFormatter));
+			builder.deserializers(new LocalDateTimeDeserializer(dateTimeFormatter));
+			builder.serializers(new LocalDateSerializer(dateFormatter));
+			builder.serializers(new LocalDateTimeSerializer(dateTimeFormatter));
 		};
 	}
 }

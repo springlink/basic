@@ -1,6 +1,5 @@
 package com.github.springlink.basic.module.sys.domain;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,12 +13,14 @@ import javax.persistence.Transient;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.github.springlink.basic.core.ApiException;
 import com.github.springlink.basic.core.RootEntitySupport;
 import com.google.common.collect.Sets;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -37,32 +38,48 @@ public class User extends RootEntitySupport {
 
 	private String password;
 
+	@Setter
 	private String phoneNumber;
 
+	@Setter
 	private String email;
 
-	private Boolean deleted;
+	@Setter
+	private String avatar;
+
+	private boolean builtIn;
+
+	@Setter
+	private boolean locked;
+
+	private boolean deleted;
 
 	@ElementCollection
 	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "role_id")
 	private Set<String> roleIds = Sets.newHashSet();
 
-	public User(String username, String password, String phoneNumber, String email, Collection<String> roleIds) {
+	public User(String username, String password, boolean builtIn) {
 		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.username = username;
 		this.password = passwordEncoder.encode(password);
-		this.phoneNumber = phoneNumber;
-		this.email = email;
+		this.builtIn = builtIn;
+		this.locked = false;
 		this.deleted = false;
-		this.roleIds.addAll(roleIds);
+	}
+
+	public void setPassword(String password) {
+		this.password = passwordEncoder.encode(password);
 	}
 
 	public boolean passwordMatches(String raw) {
 		return passwordEncoder.matches(raw, password);
 	}
 
-	public void markDeleted() {
+	public void delete() {
+		if (builtIn) {
+			throw new ApiException("DELETE_ON_BUILT_IN_USER");
+		}
 		this.deleted = true;
 	}
 }
