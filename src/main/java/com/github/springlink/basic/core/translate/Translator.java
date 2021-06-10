@@ -1,9 +1,7 @@
 package com.github.springlink.basic.core.translate;
 
+import java.util.Collection;
+
 public interface Translator {
-	Object translate(TranslatorContext context, String config, Object value) throws Exception;
-
-	void beforeTranslation(TranslatorContext context) throws Exception;
-
-	void afterTranslation(TranslatorContext context) throws Exception;
+	void translate(Collection<ValueAndResult> values) throws Exception;
 }
