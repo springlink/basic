@@ -1,59 +1,63 @@
 <template>
   <div class="app-container">
-    <el-form size="mini" :inline="true" :model="list.query">
-      <el-form-item label="用户名">
-        <el-input v-model="list.query.username" placeholder="用户名" />
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="list.query.createdDate"
-          type="datetimerange"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" :loading="list.loading" @click="onQuery()">查询</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button icon="el-icon-plus" @click="onAdd()">新增</el-button>
-      </el-form-item>
-    </el-form>
+    <el-card style="margin-bottom: 10px">
+      <el-form size="mini" :inline="true" :model="list.query">
+        <el-form-item label="用户名">
+          <el-input v-model="list.query.username" placeholder="用户名" />
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            v-model="list.query.createdDate"
+            type="datetimerange"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" :loading="list.loading" @click="onQuery()">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button icon="el-icon-plus" @click="onAdd()">新增</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
 
-    <el-table
-      v-loading="list.loading"
-      :data="list.data"
-      :default-sort="list.params"
-      size="mini"
-      border
-      fit
-      highlight-current-row
-      @sort-change="onSortChange"
-    >
-      <el-table-column type="index" align="right" :index="1" />
-      <el-table-column prop="username" label="用户名" sortable />
-      <el-table-column prop="phoneNumber" label="手机号码" width="200" align="center" />
-      <el-table-column prop="email" label="Email" width="200" align="center" />
-      <el-table-column prop="createdDate" label="创建时间" width="200" align="center" sortable />
-      <el-table-column prop="locked" label="账号锁定" width="80" align="center">
-        <template slot-scope="{row}">
-          <el-popconfirm :title="`确定要${row.locked ? '解锁' : '锁定'}账号吗？`" @confirm="onToggleLocked(row)">
-            <el-switch slot="reference" :value="row.locked" />
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button size="mini" @click="onSetProfile(row)">修改资料</el-button>
-          <el-button v-if="row.status!='published'" size="mini" @click="onSetPassword(row)">修改密码</el-button>
-          <el-popconfirm title="确定要删除用户吗？" style="margin-left:10px" @confirm="onRemove(row)">
-            <el-button slot="reference" size="mini" type="danger">删除</el-button>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
+    <el-card>
+      <el-table
+        v-loading="list.loading"
+        :data="list.data"
+        :default-sort="list.params"
+        size="mini"
+        border
+        fit
+        highlight-current-row
+        @sort-change="onSortChange"
+      >
+        <el-table-column type="index" align="right" :index="1" />
+        <el-table-column prop="username" label="用户名" sortable />
+        <el-table-column prop="phoneNumber" label="手机号码" width="200" align="center" />
+        <el-table-column prop="email" label="Email" width="200" align="center" />
+        <el-table-column prop="createdDate" label="创建时间" width="200" align="center" sortable />
+        <el-table-column prop="locked" label="账号锁定" width="80" align="center">
+          <template slot-scope="{row}">
+            <el-popconfirm :title="`确定要${row.locked ? '解锁' : '锁定'}账号吗？`" @confirm="onToggleLocked(row)">
+              <el-switch slot="reference" :value="row.locked" />
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
+          <template slot-scope="{row}">
+            <el-button size="mini" @click="onSetProfile(row)">修改资料</el-button>
+            <el-button v-if="row.status!='published'" size="mini" @click="onSetPassword(row)">修改密码</el-button>
+            <el-popconfirm title="确定要删除用户吗？" style="margin-left:10px" @confirm="onRemove(row)">
+              <el-button slot="reference" size="mini" type="danger">删除</el-button>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
 
     <pagination :total="list.total" :page.sync="list.params.page" :limit.sync="list.params.limit" @pagination="loadList" />
 
