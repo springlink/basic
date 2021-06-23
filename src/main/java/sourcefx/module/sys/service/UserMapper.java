@@ -1,0 +1,45 @@
+package sourcefx.module.sys.service;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import sourcefx.module.sys.domain.Token;
+import sourcefx.module.sys.domain.User;
+import sourcefx.module.sys.dto.MyProfileReply;
+import sourcefx.module.sys.dto.MySetProfile;
+import sourcefx.module.sys.dto.UserAdd;
+import sourcefx.module.sys.dto.UserAuth;
+import sourcefx.module.sys.dto.UserLoginReply;
+import sourcefx.module.sys.dto.UserReply;
+import sourcefx.module.sys.dto.UserSetProfile;
+
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+	@Mapping(target = "locked", ignore = true)
+	@Mapping(target = "roleIds", ignore = true)
+	@Mapping(target = "builtIn", constant = "false")
+	User addToEntity(UserAdd source);
+
+	@Mapping(target = "userId", source = "id")
+	@Mapping(target = "permissions", ignore = true)
+	UserAuth entityToAuth(User source);
+
+	UserReply entityToReply(User source);
+
+	@Mapping(target = "auth", ignore = true)
+	@Mapping(target = "token", source = "id")
+	UserLoginReply tokenToLoginReply(Token source);
+
+	@Mapping(target = "locked", ignore = true)
+	@Mapping(target = "password", ignore = true)
+	@Mapping(target = "roleIds", ignore = true)
+	void setProfileToEntity(UserSetProfile source, @MappingTarget User orElseThrow);
+
+	MyProfileReply entityToMyProfileReply(User source);
+
+	@Mapping(target = "locked", ignore = true)
+	@Mapping(target = "password", ignore = true)
+	@Mapping(target = "roleIds", ignore = true)
+	void mySetProfileToEntity(MySetProfile body, @MappingTarget User orElseThrow);
+}
