@@ -19,23 +19,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import sourcefx.core.AppException;
-import sourcefx.module.sys.dao.RoleRepository;
-import sourcefx.module.sys.dao.UserRepository;
-import sourcefx.module.sys.dao.TokenRepository;
-import sourcefx.module.sys.domain.User;
-import sourcefx.module.sys.domain.Token;
-import sourcefx.module.sys.dto.UserAuth;
-import sourcefx.module.sys.dto.UserLogin;
-import sourcefx.module.sys.dto.UserLoginReply;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lombok.RequiredArgsConstructor;
+import sourcefx.core.AppException;
+import sourcefx.module.sys.dao.RoleRepository;
+import sourcefx.module.sys.dao.TokenRepository;
+import sourcefx.module.sys.dao.UserRepository;
+import sourcefx.module.sys.domain.QUser;
+import sourcefx.module.sys.domain.Token;
+import sourcefx.module.sys.domain.User;
+import sourcefx.module.sys.dto.UserAuth;
+import sourcefx.module.sys.dto.UserLogin;
+import sourcefx.module.sys.dto.UserLoginReply;
 
 @Service
 @RequiredArgsConstructor
 public class TokenService implements OpaqueTokenIntrospector {
-	private final UserMapper userMapper;
+	private final UserConverter userMapper;
 	private final UserRepository userRepository;
 	private final TokenRepository tokenRepository;
 	private final RoleRepository roleRepository;
@@ -47,9 +49,9 @@ public class TokenService implements OpaqueTokenIntrospector {
 		Token userToken = tokenRepository.findById(token)
 				.filter(Token::isValidNow)
 				.orElseThrow(() -> new OAuth2IntrospectionException("invalid token"));
-		
+
 		userToken.touch(LocalDateTime.now().plus(Duration.ofMinutes(30)));
-		
+
 		UserAuth userAuth;
 		try {
 			userAuth = objectMapper.readValue(userToken.getData(), UserAuth.class);
@@ -75,7 +77,7 @@ public class TokenService implements OpaqueTokenIntrospector {
 
 	@Transactional
 	public UserLoginReply login(UserLogin userLogin) {
-		User user = userRepository.findByUsernameAndDeletedFalse(userLogin.getUsername())
+		User user = userRepository.findOne(QUser.user.username.eq(userLogin.getUsername()))
 				.orElseThrow(() -> new AppException("INCORRECT_LOGIN_INFO"));
 		if (!user.passwordMatches(userLogin.getPassword())) {
 			throw new AppException("INCORRECT_LOGIN_INFO");
@@ -85,11 +87,11 @@ public class TokenService implements OpaqueTokenIntrospector {
 		}
 
 		UserAuth userAuth = userMapper.entityToAuth(user);
-		userAuth.setPermissions(roleRepository
-				.findAllByIdInAndDeletedFalse(user.getRoleIds())
-				.stream()
-				.flatMap(r -> r.getPermissions().stream())
-				.collect(Collectors.toSet()));
+		userAuth.setPermissions(
+				Lists.newArrayList(roleRepository.findAllById(user.getRoleIds()))
+						.stream()
+						.flatMap(r -> r.getPermissions().stream())
+						.collect(Collectors.toSet()));
 
 		Token userToken;
 		try {

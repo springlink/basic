@@ -2,6 +2,8 @@ package sourcefx.core;
 
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
@@ -33,9 +35,15 @@ public class AppUtils implements ApplicationContextAware, DisposableBean {
 	@Getter
 	private final ApplicationContext applicationContext;
 
+	@Getter
+	private final EntityManager entityManager;
+
 	@Override
-	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-		instance = new AppUtils(ctx);
+	public synchronized void setApplicationContext(ApplicationContext ctx) throws BeansException {
+		if (instance != null) {
+			throw new IllegalStateException("Multiple AppUtils instance is now allowed");
+		}
+		instance = this;
 	}
 
 	@Override

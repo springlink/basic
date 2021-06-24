@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import com.querydsl.core.BooleanBuilder;
 
 import lombok.RequiredArgsConstructor;
-import sourcefx.core.AppException;
+import sourcefx.core.AppError;
 import sourcefx.core.AppUtils;
 import sourcefx.module.sys.dao.UserRepository;
 import sourcefx.module.sys.domain.QUser;
@@ -27,13 +27,13 @@ import sourcefx.module.sys.dto.UserSetProfile;
 @RequiredArgsConstructor
 public class UserService {
 	private final AppUtils appUtils;
-	private final UserMapper userMapper;
+	private final UserConverter userMapper;
 	private final UserRepository userRepository;
 
 	@Transactional
 	@EventListener
 	public void onContextRefreshed(ContextRefreshedEvent event) {
-		if (!userRepository.findByUsernameAndDeletedFalse("root").isPresent()) {
+		if (!userRepository.exists(QUser.user.username.eq("root"))) {
 			userRepository.save(new User("root", "123456", true));
 		}
 	}
@@ -45,8 +45,8 @@ public class UserService {
 
 	@Transactional
 	public void setPassword(UserSetPassword setPassword) {
-		userRepository.findByIdAndDeletedFalse(setPassword.getId())
-				.orElseThrow(() -> new AppException("OBJECT_NOT_FOUND"))
+		userRepository.findById(setPassword.getId())
+				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException)
 				.setPassword(setPassword.getPassword());
 	}
 
@@ -54,21 +54,21 @@ public class UserService {
 	public void setProfile(UserSetProfile setProfile) {
 		userMapper.setProfileToEntity(
 				setProfile,
-				userRepository.findByIdAndDeletedFalse(setProfile.getId())
-						.orElseThrow(() -> new AppException("OBJECT_NOT_FOUND")));
+				userRepository.findById(setProfile.getId())
+						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}
 
 	@Transactional
 	public void setLocked(UserSetLocked setLocked) {
-		userRepository.findByIdAndDeletedFalse(setLocked.getId())
-				.orElseThrow(() -> new AppException("OBJECT_NOT_FOUND"))
+		userRepository.findById(setLocked.getId())
+				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException)
 				.setLocked(setLocked.getLocked());
 	}
 
 	@Transactional
 	public void delete(String id) {
-		userRepository.findByIdAndDeletedFalse(id)
-				.orElseThrow(() -> new AppException("OBJECT_NOT_FOUND"))
+		userRepository.findById(id)
+				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException)
 				.delete();
 	}
 
@@ -87,7 +87,6 @@ public class UserService {
 		}
 		appUtils.getCurrentSubject().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
 		bb.and(QUser.user.builtIn.isFalse());
-		bb.and(QUser.user.deleted.isFalse());
 		return userRepository.findAll(bb, pageable).map(userMapper::entityToReply);
 	}
 }

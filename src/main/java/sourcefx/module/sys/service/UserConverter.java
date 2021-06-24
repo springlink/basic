@@ -15,7 +15,7 @@ import sourcefx.module.sys.dto.UserReply;
 import sourcefx.module.sys.dto.UserSetProfile;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface UserConverter {
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "roleIds", ignore = true)
 	@Mapping(target = "builtIn", constant = "false")
