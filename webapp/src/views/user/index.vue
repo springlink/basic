@@ -49,7 +49,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button size="mini" @click="onSetProfile(row)">修改资料</el-button>
+            <el-button size="mini" @click="onSetProfile(row)">编辑资料</el-button>
             <el-button v-if="row.status!='published'" size="mini" @click="onSetPassword(row)">修改密码</el-button>
             <el-popconfirm title="确定要删除用户吗？" style="margin-left:10px" @confirm="onRemove(row)">
               <el-button slot="reference" size="mini" type="danger">删除</el-button>

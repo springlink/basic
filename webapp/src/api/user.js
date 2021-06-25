@@ -18,7 +18,7 @@ export function setLocked(data) {
 }
 
 export function remove(id) {
-  return request({ url: `/user/remove/${id}`, method: 'delete' })
+  return request({ url: `/user/delete/${id}`, method: 'delete' })
 }
 
 export function page(params, query) {
