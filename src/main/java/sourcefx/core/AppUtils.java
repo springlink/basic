@@ -76,9 +76,9 @@ public class AppUtils implements ApplicationContextAware, DisposableBean {
 				.map(auth -> auth.getToken());
 	}
 
-	public Optional<String> getCurrentSubject() {
+	public Optional<Long> getCurrentUserId() {
 		return getOAuth2AuthenticatedPrincipal()
-				.map(prin -> (String) prin.getAttribute(OAuth2IntrospectionClaimNames.SUBJECT));
+				.map(prin -> Long.parseLong((String) prin.getAttribute(OAuth2IntrospectionClaimNames.SUBJECT)));
 	}
 
 	private Optional<BearerTokenAuthentication> getBearerTokenAuthentication() {

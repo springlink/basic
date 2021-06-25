@@ -11,17 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sourcefx.module.sys.dto.UserAdd;
-import sourcefx.module.sys.dto.UserQuery;
-import sourcefx.module.sys.dto.UserReply;
-import sourcefx.module.sys.dto.UserSetLocked;
-import sourcefx.module.sys.dto.UserSetPassword;
-import sourcefx.module.sys.dto.UserSetProfile;
-import sourcefx.module.sys.service.UserService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import sourcefx.module.sys.dto.user.UserAdd;
+import sourcefx.module.sys.dto.user.UserQuery;
+import sourcefx.module.sys.dto.user.UserReply;
+import sourcefx.module.sys.dto.user.UserSetLocked;
+import sourcefx.module.sys.dto.user.UserSetPassword;
+import sourcefx.module.sys.dto.user.UserSetProfile;
+import sourcefx.module.sys.service.UserService;
 
 @Tag(name = "用户管理")
 @RestController
@@ -55,8 +54,8 @@ public class UserController {
 	}
 
 	@Operation(summary = "删除用户")
-	@DeleteMapping("/remove/{id}")
-	public void remove(@PathVariable("id") String id) {
+	@DeleteMapping("/delete/{id}")
+	public void delete(@PathVariable("id") Long id) {
 		userService.delete(id);
 	}
 

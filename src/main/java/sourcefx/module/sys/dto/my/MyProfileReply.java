@@ -1,6 +1,9 @@
-package sourcefx.module.sys.dto;
+package sourcefx.module.sys.dto.my;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,7 +12,8 @@ import lombok.Data;
 @Schema(description = "个人资料")
 public class MyProfileReply {
 	@Schema(description = "用户ID")
-	private String id;
+	@JsonSerialize(using = ToStringSerializer.class)
+	private Long id;
 
 	@Schema(description = "用户名")
 	private String username;

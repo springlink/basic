@@ -1,4 +1,4 @@
-package sourcefx.module.sys.dto;
+package sourcefx.module.sys.dto.auth;
 
 import java.time.LocalDateTime;
 

@@ -5,42 +5,39 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Lob;
-
-import sourcefx.core.BaseEntity;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sourcefx.core.BaseEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Token extends BaseEntity {
+public class UserToken extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String id;
+	private String token;
 
-	private String userId;
-	
+	private Long userId;
+
 	@Lob
 	private String data;
 
 	private LocalDateTime expiresAt;
 
-	public Token(String userId, Duration ttl, String data) {
-		this.id = UUID.randomUUID().toString().replace("-", "");
+	public UserToken(Long userId, Duration ttl, String data) {
+		this.token = UUID.randomUUID().toString().replace("-", "");
 		this.userId = userId;
 		this.expiresAt = LocalDateTime.now().plus(ttl);
 		this.data = data;
 	}
-	
+
 	public boolean isValidNow() {
 		return !LocalDateTime.now().isAfter(expiresAt);
 	}
-	
+
 	public void touch(LocalDateTime expiresAt) {
 		this.expiresAt = expiresAt;
 	}

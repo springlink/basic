@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sourcefx.module.sys.dto.MyProfileReply;
-import sourcefx.module.sys.dto.MySetPassword;
-import sourcefx.module.sys.dto.MySetProfile;
+import sourcefx.module.sys.dto.my.MyProfileReply;
+import sourcefx.module.sys.dto.my.MySetPassword;
+import sourcefx.module.sys.dto.my.MySetProfile;
 import sourcefx.module.sys.service.MyService;
 
 import io.swagger.v3.oas.annotations.Operation;

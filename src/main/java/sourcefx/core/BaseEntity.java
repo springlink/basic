@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityListeners;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
 import javax.persistence.Version;
 
 import org.springframework.data.annotation.CreatedBy;
@@ -23,18 +25,23 @@ import org.springframework.util.Assert;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import sourcefx.util.Snowflake;
 
-@MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
 @SuppressWarnings("serial")
 public abstract class BaseEntity implements Serializable {
+	@Getter
+	@Id
+	private Long id;
+
 	@Getter
 	@CreatedDate
 	private LocalDateTime createdDate;
 
 	@Getter
 	@CreatedBy
-	private String createdBy;
+	private Long createdBy;
 
 	@Getter
 	@LastModifiedDate
@@ -42,13 +49,27 @@ public abstract class BaseEntity implements Serializable {
 
 	@Getter
 	@LastModifiedBy
-	private String lastModifiedBy;
+	private Long lastModifiedBy;
+
+	@Getter
+	private boolean deleted;
 
 	@Version
 	private Long version = 0L;
 
 	@Transient
 	private transient final List<Object> domainEvents = Lists.newArrayListWithCapacity(1);
+
+	public void markDeleted() {
+		this.deleted = true;
+	}
+
+	@PrePersist
+	protected void prePersist() {
+		if (id == null) {
+			id = Snowflake.getInstance().next();
+		}
+	}
 
 	protected <T> T registerEvent(T event) {
 		Assert.notNull(event, "Domain event must not be null!");

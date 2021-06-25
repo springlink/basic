@@ -1,4 +1,4 @@
-package sourcefx.module.sys.dto;
+package sourcefx.module.sys.dto.my;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

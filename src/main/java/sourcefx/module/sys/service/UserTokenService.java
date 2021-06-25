@@ -25,29 +25,30 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import sourcefx.core.AppException;
 import sourcefx.module.sys.dao.RoleRepository;
-import sourcefx.module.sys.dao.TokenRepository;
+import sourcefx.module.sys.dao.UserTokenRepository;
 import sourcefx.module.sys.dao.UserRepository;
 import sourcefx.module.sys.domain.QUser;
-import sourcefx.module.sys.domain.Token;
+import sourcefx.module.sys.domain.QUserToken;
 import sourcefx.module.sys.domain.User;
-import sourcefx.module.sys.dto.UserAuth;
-import sourcefx.module.sys.dto.UserLogin;
-import sourcefx.module.sys.dto.UserLoginReply;
+import sourcefx.module.sys.domain.UserToken;
+import sourcefx.module.sys.dto.auth.UserAuth;
+import sourcefx.module.sys.dto.auth.UserLogin;
+import sourcefx.module.sys.dto.auth.UserLoginReply;
 
 @Service
 @RequiredArgsConstructor
-public class TokenService implements OpaqueTokenIntrospector {
-	private final UserConverter userMapper;
+public class UserTokenService implements OpaqueTokenIntrospector {
+	private final UserConverter userConverter;
 	private final UserRepository userRepository;
-	private final TokenRepository tokenRepository;
+	private final UserTokenRepository userTokenRepository;
 	private final RoleRepository roleRepository;
 	private final ObjectMapper objectMapper;
 
 	@Transactional
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
-		Token userToken = tokenRepository.findById(token)
-				.filter(Token::isValidNow)
+		UserToken userToken = userTokenRepository.findOne(QUserToken.userToken.token.eq(token))
+				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new OAuth2IntrospectionException("invalid token"));
 
 		userToken.touch(LocalDateTime.now().plus(Duration.ofMinutes(30)));
@@ -60,7 +61,7 @@ public class TokenService implements OpaqueTokenIntrospector {
 		}
 
 		Map<String, Object> attributes = Maps.newHashMap();
-		attributes.put(OAuth2IntrospectionClaimNames.SUBJECT, userAuth.getUserId());
+		attributes.put(OAuth2IntrospectionClaimNames.SUBJECT, String.valueOf(userAuth.getUserId()));
 		attributes.put(OAuth2IntrospectionClaimNames.ISSUED_AT,
 				userToken.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant());
 		attributes.put(OAuth2IntrospectionClaimNames.EXPIRES_AT,
@@ -86,30 +87,30 @@ public class TokenService implements OpaqueTokenIntrospector {
 			throw new AppException("USER_LOCKED");
 		}
 
-		UserAuth userAuth = userMapper.entityToAuth(user);
+		UserAuth userAuth = userConverter.entityToAuth(user);
 		userAuth.setPermissions(
 				Lists.newArrayList(roleRepository.findAllById(user.getRoleIds()))
 						.stream()
 						.flatMap(r -> r.getPermissions().stream())
 						.collect(Collectors.toSet()));
 
-		Token userToken;
+		UserToken userToken;
 		try {
-			userToken = tokenRepository.save(
-					new Token(user.getId(), Duration.ofHours(1),
+			userToken = userTokenRepository.save(
+					new UserToken(user.getId(), Duration.ofHours(1),
 							objectMapper.writeValueAsString(userAuth)));
 		} catch (JsonProcessingException e) {
 			throw new AppException("IO_ERROR");
 		}
 
-		UserLoginReply userLoginReply = userMapper.tokenToLoginReply(userToken);
+		UserLoginReply userLoginReply = userConverter.tokenToLoginReply(userToken);
 		userLoginReply.setAuth(userAuth);
 		return userLoginReply;
 	}
 
 	public UserAuth getAuthByToken(String token) {
-		Token userToken = tokenRepository.findById(token)
-				.filter(Token::isValidNow)
+		UserToken userToken = userTokenRepository.findOne(QUserToken.userToken.token.eq(token))
+				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new AppException("INVALID_TOKEN"));
 		try {
 			return objectMapper.readValue(userToken.getData(), UserAuth.class);

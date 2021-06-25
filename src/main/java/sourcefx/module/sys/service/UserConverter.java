@@ -4,15 +4,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import sourcefx.module.sys.domain.Token;
+import sourcefx.module.sys.domain.UserToken;
 import sourcefx.module.sys.domain.User;
-import sourcefx.module.sys.dto.MyProfileReply;
-import sourcefx.module.sys.dto.MySetProfile;
-import sourcefx.module.sys.dto.UserAdd;
-import sourcefx.module.sys.dto.UserAuth;
-import sourcefx.module.sys.dto.UserLoginReply;
-import sourcefx.module.sys.dto.UserReply;
-import sourcefx.module.sys.dto.UserSetProfile;
+import sourcefx.module.sys.dto.auth.UserAuth;
+import sourcefx.module.sys.dto.auth.UserLoginReply;
+import sourcefx.module.sys.dto.my.MyProfileReply;
+import sourcefx.module.sys.dto.my.MySetProfile;
+import sourcefx.module.sys.dto.user.UserAdd;
+import sourcefx.module.sys.dto.user.UserReply;
+import sourcefx.module.sys.dto.user.UserSetProfile;
 
 @Mapper(componentModel = "spring")
 public interface UserConverter {
@@ -28,8 +28,7 @@ public interface UserConverter {
 	UserReply entityToReply(User source);
 
 	@Mapping(target = "auth", ignore = true)
-	@Mapping(target = "token", source = "id")
-	UserLoginReply tokenToLoginReply(Token source);
+	UserLoginReply tokenToLoginReply(UserToken source);
 
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "password", ignore = true)

@@ -13,10 +13,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import sourcefx.core.AppUtils;
-import sourcefx.module.sys.dto.UserAuth;
-import sourcefx.module.sys.dto.UserLogin;
-import sourcefx.module.sys.dto.UserLoginReply;
-import sourcefx.module.sys.service.TokenService;
+import sourcefx.module.sys.dto.auth.UserAuth;
+import sourcefx.module.sys.dto.auth.UserLogin;
+import sourcefx.module.sys.dto.auth.UserLoginReply;
+import sourcefx.module.sys.service.UserTokenService;
 
 @Tag(name = "用户授权")
 @RestController
@@ -24,7 +24,7 @@ import sourcefx.module.sys.service.TokenService;
 @RequiredArgsConstructor
 public class AuthController {
 	private final AppUtils appUtils;
-	private final TokenService tokenService;
+	private final UserTokenService tokenService;
 
 	@Operation(summary = "登录")
 	@PostMapping("/login")

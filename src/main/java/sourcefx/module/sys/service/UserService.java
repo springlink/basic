@@ -16,18 +16,18 @@ import sourcefx.core.AppUtils;
 import sourcefx.module.sys.dao.UserRepository;
 import sourcefx.module.sys.domain.QUser;
 import sourcefx.module.sys.domain.User;
-import sourcefx.module.sys.dto.UserAdd;
-import sourcefx.module.sys.dto.UserQuery;
-import sourcefx.module.sys.dto.UserReply;
-import sourcefx.module.sys.dto.UserSetLocked;
-import sourcefx.module.sys.dto.UserSetPassword;
-import sourcefx.module.sys.dto.UserSetProfile;
+import sourcefx.module.sys.dto.user.UserAdd;
+import sourcefx.module.sys.dto.user.UserQuery;
+import sourcefx.module.sys.dto.user.UserReply;
+import sourcefx.module.sys.dto.user.UserSetLocked;
+import sourcefx.module.sys.dto.user.UserSetPassword;
+import sourcefx.module.sys.dto.user.UserSetProfile;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 	private final AppUtils appUtils;
-	private final UserConverter userMapper;
+	private final UserConverter userConverter;
 	private final UserRepository userRepository;
 
 	@Transactional
@@ -40,7 +40,7 @@ public class UserService {
 
 	@Transactional
 	public UserReply add(UserAdd add) {
-		return userMapper.entityToReply(userRepository.save(userMapper.addToEntity(add)));
+		return userConverter.entityToReply(userRepository.save(userConverter.addToEntity(add)));
 	}
 
 	@Transactional
@@ -52,7 +52,7 @@ public class UserService {
 
 	@Transactional
 	public void setProfile(UserSetProfile setProfile) {
-		userMapper.setProfileToEntity(
+		userConverter.setProfileToEntity(
 				setProfile,
 				userRepository.findById(setProfile.getId())
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
@@ -66,10 +66,10 @@ public class UserService {
 	}
 
 	@Transactional
-	public void delete(String id) {
+	public void delete(Long id) {
 		userRepository.findById(id)
 				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException)
-				.delete();
+				.markDeleted();
 	}
 
 	public Page<UserReply> page(UserQuery query, Pageable pageable) {
@@ -85,8 +85,9 @@ public class UserService {
 				bb.and(QUser.user.createdDate.loe(query.getCreatedDate()[1]));
 			}
 		}
-		appUtils.getCurrentSubject().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
+		appUtils.getCurrentUserId().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
 		bb.and(QUser.user.builtIn.isFalse());
-		return userRepository.findAll(bb, pageable).map(userMapper::entityToReply);
+		bb.and(QUser.user.deleted.isFalse());
+		return userRepository.findAll(bb, pageable).map(userConverter::entityToReply);
 	}
 }

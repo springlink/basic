@@ -1,7 +1,5 @@
 package sourcefx.module.sys.service;
 
-import javax.validation.Valid;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,34 +9,34 @@ import sourcefx.core.AppException;
 import sourcefx.core.AppUtils;
 import sourcefx.module.sys.dao.UserRepository;
 import sourcefx.module.sys.domain.User;
-import sourcefx.module.sys.dto.MyProfileReply;
-import sourcefx.module.sys.dto.MySetPassword;
-import sourcefx.module.sys.dto.MySetProfile;
+import sourcefx.module.sys.dto.my.MyProfileReply;
+import sourcefx.module.sys.dto.my.MySetPassword;
+import sourcefx.module.sys.dto.my.MySetProfile;
 
 @Service
 @RequiredArgsConstructor
 public class MyService {
 	private final AppUtils appUtils;
-	private final UserConverter userMapper;
+	private final UserConverter userConverter;
 	private final UserRepository userRepository;
 
 	public MyProfileReply profile() {
-		return userMapper.entityToMyProfileReply(
-				userRepository.findById(appUtils.getCurrentSubject().orElse(null))
+		return userConverter.entityToMyProfileReply(
+				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}
 
 	@Transactional
-	public void setProfile(@Valid MySetProfile body) {
-		userMapper.mySetProfileToEntity(
+	public void setProfile(MySetProfile body) {
+		userConverter.mySetProfileToEntity(
 				body,
-				userRepository.findById(appUtils.getCurrentSubject().orElse(null))
+				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}
 
 	@Transactional
-	public void setPassword(@Valid MySetPassword body) {
-		User user = userRepository.findById(appUtils.getCurrentSubject().orElse(null))
+	public void setPassword(MySetPassword body) {
+		User user = userRepository.findById(appUtils.getCurrentUserId().orElse(null))
 				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException);
 		if (!user.passwordMatches(body.getPassword())) {
 			throw new AppException("INCORRECT_PASSWORD");

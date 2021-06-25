@@ -1,6 +1,9 @@
-package sourcefx.module.sys.dto;
+package sourcefx.module.sys.dto.auth;
 
 import java.util.Set;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,7 +12,8 @@ import lombok.Data;
 @Schema(description = "用户授权信息")
 public class UserAuth {
 	@Schema(description = "用户ID")
-	private String userId;
+	@JsonSerialize(using = ToStringSerializer.class)
+	private Long userId;
 
 	@Schema(description = "用户名")
 	private String username;

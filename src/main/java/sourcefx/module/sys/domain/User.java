@@ -1,13 +1,11 @@
 package sourcefx.module.sys.domain;
 
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
@@ -32,9 +30,6 @@ public class User extends BaseEntity {
 	@Transient
 	private final PasswordEncoder passwordEncoder = AppUtils.getInstance().getBean(PasswordEncoder.class);
 
-	@Id
-	private String id;
-
 	private String username;
 
 	private String password;
@@ -53,20 +48,16 @@ public class User extends BaseEntity {
 	@Setter
 	private boolean locked;
 
-	private boolean deleted;
-
 	@ElementCollection
 	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "role_id")
-	private Set<String> roleIds = Sets.newHashSet();
+	private Set<Long> roleIds = Sets.newHashSet();
 
 	public User(String username, String password, boolean builtIn) {
-		this.id = UUID.randomUUID().toString().replace("-", "");
 		this.username = username;
 		this.password = passwordEncoder.encode(password);
 		this.builtIn = builtIn;
 		this.locked = false;
-		this.deleted = false;
 	}
 
 	public void setPassword(String password) {
@@ -77,10 +68,11 @@ public class User extends BaseEntity {
 		return passwordEncoder.matches(raw, password);
 	}
 
-	public void delete() {
+	@Override
+	public void markDeleted() {
 		if (builtIn) {
 			throw new AppException("DELETE_ON_BUILT_IN_USER");
 		}
-		this.deleted = true;
+		super.markDeleted();
 	}
 }
