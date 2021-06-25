@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,36 +30,42 @@ import sourcefx.module.sys.service.UserService;
 public class UserController {
 	private final UserService userService;
 
+	@Secured("SYS_USER_ADD")
 	@Operation(summary = "添加用户")
 	@PostMapping("/add")
 	public UserReply add(@RequestBody @Valid UserAdd body) {
 		return userService.add(body);
 	}
 
+	@Secured("SYS_USER_SET_PROFILE")
 	@Operation(summary = "修改资料")
 	@PostMapping("/setProfile")
 	public void setProfile(@RequestBody @Valid UserSetProfile body) {
 		userService.setProfile(body);
 	}
 
+	@Secured("SYS_ROLE_SET_PASSWORD")
 	@Operation(summary = "修改密码")
 	@PostMapping("/setPassword")
 	public void setPassword(@RequestBody @Valid UserSetPassword body) {
 		userService.setPassword(body);
 	}
 
+	@Secured("SYS_ROLE_SET_LOCKED")
 	@Operation(summary = "修改锁定状态")
 	@PostMapping("/setLocked")
 	public void setLocked(@RequestBody @Valid UserSetLocked body) {
 		userService.setLocked(body);
 	}
 
+	@Secured("SYS_ROLE_DELETE")
 	@Operation(summary = "删除用户")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable("id") Long id) {
 		userService.delete(id);
 	}
 
+	@Secured("SYS_ROLE_QUERY")
 	@Operation(summary = "用户列表")
 	@PostMapping("/page")
 	public Page<UserReply> list(@RequestBody @Valid UserQuery body, Pageable pageable) {
