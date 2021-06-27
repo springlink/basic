@@ -1,5 +1,8 @@
 package sourcefx.module.sys.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,7 @@ import com.querydsl.core.BooleanBuilder;
 
 import lombok.RequiredArgsConstructor;
 import sourcefx.core.AppError;
+import sourcefx.core.permission.PermissionRegistry;
 import sourcefx.module.sys.dao.RoleRepository;
 import sourcefx.module.sys.domain.QRole;
 import sourcefx.module.sys.dto.role.PermissionReply;
@@ -22,6 +26,7 @@ import sourcefx.module.sys.dto.role.RoleSetDisabled;
 @Service
 @RequiredArgsConstructor
 public class RoleService {
+	private final PermissionRegistry permissionRegistry;
 	private final RoleConverter roleConverter;
 	private final RoleRepository roleRepository;
 
@@ -62,8 +67,11 @@ public class RoleService {
 		return roleRepository.findAll(bb, pageable).map(roleConverter::entityToReply);
 	}
 
-	public Page<PermissionReply> permissionList() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PermissionReply> permissionList() {
+		return permissionRegistry.getRootPermissions()
+				.stream()
+				.sorted((a, b) -> a.getName().compareTo(b.getName()))
+				.map(roleConverter::permissionToReply)
+				.collect(Collectors.toList());
 	}
 }

@@ -1,10 +1,11 @@
 package sourcefx.module.sys.api;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,35 +31,30 @@ import sourcefx.module.sys.service.RoleService;
 public class RoleController {
 	private final RoleService roleService;
 
-	@Secured("SYS_ROLE_ADD")
 	@Operation(summary = "添加角色")
 	@PostMapping("/add")
 	public RoleReply add(@RequestBody @Valid RoleAdd body) {
 		return roleService.add(body);
 	}
 
-	@Secured("SYS_ROLE_EDIT")
 	@Operation(summary = "修改角色")
 	@PostMapping("/setDetail")
 	public void setDetail(@RequestBody @Valid RoleSetDetail body) {
 		roleService.setDetail(body);
 	}
 
-	@Secured("SYS_ROLE_DELETE")
 	@Operation(summary = "删除角色")
 	@DeleteMapping("/delete/{id}")
 	public void delete(@PathVariable("id") Long id) {
 		roleService.delete(id);
 	}
 
-	@Secured("SYS_ROLE_EDIT")
 	@Operation(summary = "修改禁用状态")
 	@PostMapping("/setDisabled")
 	public void setDisabled(@RequestBody @Valid RoleSetDisabled body) {
 		roleService.setDisabled(body);
 	}
 
-	@Secured("SYS_ROLE_QUERY")
 	@Operation(summary = "角色列表")
 	@PostMapping("/page")
 	public Page<RoleReply> list(@RequestBody @Valid RoleQuery body, Pageable pageable) {
@@ -67,7 +63,7 @@ public class RoleController {
 
 	@Operation(summary = "权限列表")
 	@PostMapping("/permissionList")
-	public Page<PermissionReply> permissionList() {
+	public List<PermissionReply> permissionList() {
 		return roleService.permissionList();
 	}
 }
