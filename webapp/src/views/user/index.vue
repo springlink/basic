@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-card style="margin-bottom: 10px">
-      <el-form size="mini" :inline="true" :model="list.query">
+      <el-form size="mini" :inline="true" :model="list.query" class="query-form">
         <el-form-item label="用户名">
           <el-input v-model="list.query.username" placeholder="用户名" />
         </el-form-item>
