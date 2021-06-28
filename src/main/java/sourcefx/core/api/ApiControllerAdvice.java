@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import sourcefx.BasicApplication;
+import sourcefx.Application;
 import sourcefx.core.AppException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class ApiControllerAdvice implements ResponseBodyAdvice<Object> {
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
 		return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType)
-				&& returnType.getContainingClass().getName().startsWith(BasicApplication.class.getPackage().getName());
+				&& returnType.getContainingClass().getName().startsWith(Application.class.getPackage().getName());
 	}
 
 	@Override
