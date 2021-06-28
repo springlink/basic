@@ -1,5 +1,6 @@
 package sourcefx.core.api;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.core.MethodParameter;
@@ -22,10 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import lombok.extern.slf4j.Slf4j;
 import sourcefx.Application;
 import sourcefx.core.AppException;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ControllerAdvice
@@ -56,7 +56,7 @@ public class ApiControllerAdvice implements ResponseBodyAdvice<Object> {
 	@ResponseBody
 	@ExceptionHandler(AppException.class)
 	@ResponseStatus(HttpStatus.OK)
-	public Object handleEtyException(AppException ex) {
+	public ApiResult<Void> handleAppException(AppException ex) {
 		log.debug(ex.getMessage(), ex);
 		return ApiResult.error(ex.getCode(), ex.getMessage());
 	}
@@ -64,7 +64,7 @@ public class ApiControllerAdvice implements ResponseBodyAdvice<Object> {
 	@ResponseBody
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.OK)
-	public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+	public ApiResult<List<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 		log.debug(ex.getMessage(), ex);
 		BindingResult bindingResult = ex.getBindingResult();
 		return ApiResult.error("BAD_REQUEST", "请求参数验证失败", bindingResult.getAllErrors().stream()
