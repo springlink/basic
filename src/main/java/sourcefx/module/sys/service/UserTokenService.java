@@ -87,7 +87,7 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 			throw new AppException("USER_LOCKED");
 		}
 
-		UserAuth userAuth = userConverter.entityToAuth(user);
+		UserAuth userAuth = userConverter.convertToAuth(user);
 		userAuth.setPermissions(
 				Lists.newArrayList(roleRepository.findAllById(user.getRoleIds()))
 						.stream()
@@ -103,7 +103,7 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 			throw new AppException("IO_ERROR");
 		}
 
-		UserLoginReply userLoginReply = userConverter.tokenToLoginReply(userToken);
+		UserLoginReply userLoginReply = userConverter.convert(userToken);
 		userLoginReply.setAuth(userAuth);
 		return userLoginReply;
 	}

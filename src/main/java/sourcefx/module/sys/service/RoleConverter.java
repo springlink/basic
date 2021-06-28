@@ -9,14 +9,17 @@ import sourcefx.module.sys.dto.role.PermissionReply;
 import sourcefx.module.sys.dto.role.RoleAdd;
 import sourcefx.module.sys.dto.role.RoleReply;
 import sourcefx.module.sys.dto.role.RoleSetDetail;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RoleConverter {
-	Role addToEntity(RoleAdd add);
+	@Mapping(target = "disabled", ignore = true)
+	Role convert(RoleAdd add);
 
-	RoleReply entityToReply(Role entity);
+	RoleReply convert(Role entity);
 
-	void setDetailToEntity(RoleSetDetail setDetail, @MappingTarget Role role);
+	@Mapping(target = "disabled", ignore = true)
+	void convert(RoleSetDetail setDetail, @MappingTarget Role role);
 
-	PermissionReply permissionToReply(Permission source);
+	PermissionReply convert(Permission source);
 }

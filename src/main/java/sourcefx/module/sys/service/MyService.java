@@ -28,7 +28,7 @@ public class MyService {
 
 	@Transactional
 	public void setProfile(MySetProfile body) {
-		userConverter.mySetProfileToEntity(
+		userConverter.convert(
 				body,
 				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));

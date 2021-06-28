@@ -19,26 +19,26 @@ public interface UserConverter {
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "roleIds", ignore = true)
 	@Mapping(target = "builtIn", constant = "false")
-	User addToEntity(UserAdd source);
+	User convert(UserAdd source);
 
 	@Mapping(target = "userId", source = "id")
 	@Mapping(target = "permissions", ignore = true)
-	UserAuth entityToAuth(User source);
+	UserAuth convertToAuth(User source);
 
-	UserReply entityToReply(User source);
+	UserReply convertToReply(User source);
 
 	@Mapping(target = "auth", ignore = true)
-	UserLoginReply tokenToLoginReply(UserToken source);
+	UserLoginReply convert(UserToken source);
 
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "password", ignore = true)
 	@Mapping(target = "roleIds", ignore = true)
-	void setProfileToEntity(UserSetProfile source, @MappingTarget User orElseThrow);
+	void convert(UserSetProfile source, @MappingTarget User orElseThrow);
 
 	MyProfileReply entityToMyProfileReply(User source);
 
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "password", ignore = true)
 	@Mapping(target = "roleIds", ignore = true)
-	void mySetProfileToEntity(MySetProfile body, @MappingTarget User orElseThrow);
+	void convert(MySetProfile body, @MappingTarget User orElseThrow);
 }

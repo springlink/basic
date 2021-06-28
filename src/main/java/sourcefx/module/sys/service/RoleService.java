@@ -32,12 +32,12 @@ public class RoleService {
 
 	@Transactional
 	public RoleReply add(RoleAdd add) {
-		return roleConverter.entityToReply(roleRepository.save(roleConverter.addToEntity(add)));
+		return roleConverter.convert(roleRepository.save(roleConverter.convert(add)));
 	}
 
 	@Transactional
 	public void setDetail(RoleSetDetail setDetail) {
-		roleConverter.setDetailToEntity(
+		roleConverter.convert(
 				setDetail,
 				roleRepository.findById(setDetail.getId())
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
@@ -64,14 +64,14 @@ public class RoleService {
 			bb.and(QRole.role.name.containsIgnoreCase(query.getName()));
 		}
 		bb.and(QRole.role.deleted.isFalse());
-		return roleRepository.findAll(bb, pageable).map(roleConverter::entityToReply);
+		return roleRepository.findAll(bb, pageable).map(roleConverter::convert);
 	}
 
 	public List<PermissionReply> permissionList() {
 		return permissionRegistry.getRootPermissions()
 				.stream()
 				.sorted((a, b) -> a.getName().compareTo(b.getName()))
-				.map(roleConverter::permissionToReply)
+				.map(roleConverter::convert)
 				.collect(Collectors.toList());
 	}
 }

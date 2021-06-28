@@ -40,7 +40,7 @@ public class UserService {
 
 	@Transactional
 	public UserReply add(UserAdd add) {
-		return userConverter.entityToReply(userRepository.save(userConverter.addToEntity(add)));
+		return userConverter.convertToReply(userRepository.save(userConverter.convert(add)));
 	}
 
 	@Transactional
@@ -52,7 +52,7 @@ public class UserService {
 
 	@Transactional
 	public void setProfile(UserSetProfile setProfile) {
-		userConverter.setProfileToEntity(
+		userConverter.convert(
 				setProfile,
 				userRepository.findById(setProfile.getId())
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
@@ -88,6 +88,6 @@ public class UserService {
 		appUtils.getCurrentUserId().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
 		bb.and(QUser.user.builtIn.isFalse());
 		bb.and(QUser.user.deleted.isFalse());
-		return userRepository.findAll(bb, pageable).map(userConverter::entityToReply);
+		return userRepository.findAll(bb, pageable).map(userConverter::convertToReply);
 	}
 }
