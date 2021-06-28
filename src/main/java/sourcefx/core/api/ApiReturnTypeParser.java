@@ -15,7 +15,7 @@ public class ApiReturnTypeParser implements ReturnTypeParser {
 		if (methodParameter.getGenericParameterType() instanceof ParameterizedType) {
 			ParameterizedType paramType = (ParameterizedType) methodParameter.getGenericParameterType();
 			if (Page.class.isAssignableFrom((Class<?>) paramType.getRawType())) {
-				paramType = newParameterizedType(ApiPage.class, paramType.getActualTypeArguments());
+				paramType = newParameterizedType(ApiResult.Page.class, paramType.getActualTypeArguments());
 			}
 			return newParameterizedType(ApiResult.class, ReturnTypeParser.resolveType(
 					paramType, methodParameter.getContainingClass()));

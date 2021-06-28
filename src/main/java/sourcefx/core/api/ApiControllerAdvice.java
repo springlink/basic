@@ -46,7 +46,7 @@ public class ApiControllerAdvice implements ResponseBodyAdvice<Object> {
 		if (body instanceof ApiResult) {
 			result = (ApiResult<?>) body;
 		} else if (body instanceof Page) {
-			result = ApiResult.ok(ApiPage.fromPage((Page<?>) body));
+			result = ApiResult.ok((Page<?>) body);
 		} else {
 			result = ApiResult.ok(body);
 		}
