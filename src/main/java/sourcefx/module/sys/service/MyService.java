@@ -21,7 +21,7 @@ public class MyService {
 	private final UserRepository userRepository;
 
 	public MyProfileReply profile() {
-		return userConverter.entityToMyProfileReply(
+		return userConverter.convertToMyProfileReply(
 				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}

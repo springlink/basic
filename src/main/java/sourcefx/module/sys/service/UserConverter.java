@@ -35,7 +35,7 @@ public interface UserConverter {
 	@Mapping(target = "roleIds", ignore = true)
 	void convert(UserSetProfile source, @MappingTarget User orElseThrow);
 
-	MyProfileReply entityToMyProfileReply(User source);
+	MyProfileReply convertToMyProfileReply(User source);
 
 	@Mapping(target = "locked", ignore = true)
 	@Mapping(target = "password", ignore = true)
