@@ -2,6 +2,7 @@ package sourcefx.core.data;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -21,6 +22,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.lang.Nullable;
 
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.NonUniqueResultException;
 import com.querydsl.core.types.OrderSpecifier;
@@ -39,15 +41,20 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 	private final JpaEntityInformation<T, ?> entityInformation;
 	private final EntityManager entityManager;
 	private final PathBuilder<T> path;
+	private final PathBuilder<Object> pathForId;
 	private final BooleanPath pathForDeleted;
 	private final Querydsl querydsl;
 
 	public BaseRepositoryImpl(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
+
 		this.entityInformation = entityInformation;
 		this.entityManager = entityManager;
+
 		this.path = new PathBuilderFactory().create(entityInformation.getJavaType());
+		this.pathForId = path.get(this.entityInformation.getRequiredIdAttribute().getName());
 		this.pathForDeleted = getPathForDeleted(this.path, this.entityManager);
+
 		this.querydsl = new Querydsl(entityManager, this.path);
 	}
 
@@ -62,7 +69,7 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 
 	@Override
 	public Optional<T> findById(ID id) {
-		return findOne(path.get(entityInformation.getRequiredIdAttribute().getName()).eq(id));
+		return findOne(pathForId.eq(id));
 	}
 
 	@Override
@@ -94,6 +101,11 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 	}
 
 	@Override
+	public List<T> findAllById(Iterable<ID> ids) {
+		return Lists.newArrayList(findAll(pathForId.in(Lists.newArrayList(ids))));
+	}
+
+	@Override
 	public long count(Predicate predicate) {
 		return createCountQuery(predicate).fetchCount();
 	}
@@ -101,6 +113,11 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 	@Override
 	public boolean exists(Predicate predicate) {
 		return count(predicate) > 0;
+	}
+
+	@Override
+	public boolean existsById(ID id) {
+		return exists(pathForId.eq(id));
 	}
 
 	private JPQLQuery<T> createQuery(@Nullable Predicate predicate) {
