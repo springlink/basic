@@ -63,7 +63,6 @@ public class RoleService {
 		if (StringUtils.hasText(query.getName())) {
 			bb.and(QRole.role.name.containsIgnoreCase(query.getName()));
 		}
-		bb.and(QRole.role.deleted.isFalse());
 		return roleRepository.findAll(bb, pageable).map(roleConverter::convert);
 	}
 

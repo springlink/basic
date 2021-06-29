@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sourcefx.core.BaseEntity;
+import sourcefx.core.data.BaseEntity;
 
 @Entity
 @Getter

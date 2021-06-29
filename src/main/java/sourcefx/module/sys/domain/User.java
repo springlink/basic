@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sourcefx.core.AppException;
 import sourcefx.core.AppUtils;
-import sourcefx.core.BaseEntity;
+import sourcefx.core.data.BaseEntity;
 
 @Entity
 @Getter

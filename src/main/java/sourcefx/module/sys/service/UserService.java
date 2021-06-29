@@ -87,7 +87,6 @@ public class UserService {
 		}
 		appUtils.getCurrentUserId().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
 		bb.and(QUser.user.builtIn.isFalse());
-		bb.and(QUser.user.deleted.isFalse());
 		return userRepository.findAll(bb, pageable).map(userConverter::convertToReply);
 	}
 }

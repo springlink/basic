@@ -1,4 +1,4 @@
-package sourcefx.core;
+package sourcefx.core.data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import sourcefx.core.AppUtils;
 import sourcefx.util.Snowflake;
 
 @MappedSuperclass
@@ -42,6 +43,7 @@ public abstract class BaseEntity implements Serializable {
 	private Long lastModifiedBy;
 
 	@Getter
+	@Deleted
 	private boolean deleted;
 
 	@Version
