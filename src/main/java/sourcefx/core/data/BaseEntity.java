@@ -15,11 +15,11 @@ import javax.persistence.Version;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
-import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import lombok.NonNull;
 import sourcefx.core.AppUtils;
 import sourcefx.util.Snowflake;
 
@@ -75,8 +75,7 @@ public abstract class BaseEntity implements Serializable {
 		lastModifiedBy = AppUtils.getCurrentUserId().orElse(null);
 	}
 
-	protected <T> T registerEvent(T event) {
-		Assert.notNull(event, "Domain event must not be null!");
+	protected <T> T registerEvent(@NonNull T event) {
 		this.domainEvents.add(event);
 		return event;
 	}
