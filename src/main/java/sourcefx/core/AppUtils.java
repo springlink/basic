@@ -2,10 +2,9 @@ package sourcefx.core;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.Authentication;
@@ -18,21 +17,18 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Component
-@RequiredArgsConstructor
-public class AppUtils implements ApplicationContextAware, DisposableBean {
+public final class AppUtils implements InitializingBean, DisposableBean, ApplicationContextAware {
 	private static AppUtils instance;
 
 	@Getter
-	private final ApplicationContext applicationContext;
-
-	@Getter
-	private final EntityManager entityManager;
+	@Setter
+	private ApplicationContext applicationContext;
 
 	@Override
-	public synchronized void setApplicationContext(ApplicationContext ctx) throws BeansException {
+	public synchronized void afterPropertiesSet() throws Exception {
 		if (instance != null) {
 			throw new IllegalStateException("Multiple AppUtils instance is now allowed");
 		}
@@ -40,35 +36,38 @@ public class AppUtils implements ApplicationContextAware, DisposableBean {
 	}
 
 	@Override
-	public void destroy() throws Exception {
+	public synchronized void destroy() throws Exception {
 		instance = null;
 	}
 
-	private static AppUtils getInstance() {
-		if (instance == null) {
-			throw new IllegalStateException("ApplicationUtils instance unavailable");
-		}
-		return instance;
+	private ApplicationContext requireApplicationContext() {
+		return Optional.ofNullable(getApplicationContext())
+				.orElseThrow(() -> new IllegalStateException("ApplicationContext unavailable"));
+	}
+
+	private static AppUtils requireInstance() {
+		return Optional.ofNullable(instance)
+				.orElseThrow(() -> new IllegalStateException("AppUtils instance unavailable"));
 	}
 
 	public static Object getBean(String name) throws BeansException {
-		return getInstance().applicationContext.getBean(name);
+		return requireInstance().requireApplicationContext().getBean(name);
 	}
 
 	public static <T> T getBean(String name, Class<T> requiredType) throws BeansException {
-		return getInstance().applicationContext.getBean(name, requiredType);
+		return requireInstance().requireApplicationContext().getBean(name, requiredType);
 	}
 
 	public static Object getBean(String name, Object... args) throws BeansException {
-		return getInstance().applicationContext.getBean(name, args);
+		return requireInstance().requireApplicationContext().getBean(name, args);
 	}
 
 	public static <T> T getBean(Class<T> requiredType) throws BeansException {
-		return getInstance().applicationContext.getBean(requiredType);
+		return requireInstance().requireApplicationContext().getBean(requiredType);
 	}
 
 	public static <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
-		return getInstance().applicationContext.getBean(requiredType, args);
+		return requireInstance().requireApplicationContext().getBean(requiredType, args);
 	}
 
 	public static Optional<OAuth2AccessToken> getCurrentToken() {
