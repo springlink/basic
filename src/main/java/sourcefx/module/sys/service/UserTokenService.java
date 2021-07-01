@@ -25,10 +25,8 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import sourcefx.core.AppException;
 import sourcefx.module.sys.dao.RoleRepository;
-import sourcefx.module.sys.dao.UserTokenRepository;
 import sourcefx.module.sys.dao.UserRepository;
-import sourcefx.module.sys.domain.QUser;
-import sourcefx.module.sys.domain.QUserToken;
+import sourcefx.module.sys.dao.UserTokenRepository;
 import sourcefx.module.sys.domain.User;
 import sourcefx.module.sys.domain.UserToken;
 import sourcefx.module.sys.dto.auth.UserAuth;
@@ -47,7 +45,7 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 	@Transactional
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
-		UserToken userToken = userTokenRepository.findOne(QUserToken.userToken.token.eq(token))
+		UserToken userToken = userTokenRepository.findByToken(token)
 				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new OAuth2IntrospectionException("invalid token"));
 
@@ -78,7 +76,7 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 
 	@Transactional
 	public UserLoginReply login(UserLogin userLogin) {
-		User user = userRepository.findOne(QUser.user.username.eq(userLogin.getUsername()))
+		User user = userRepository.findByUsername(userLogin.getUsername())
 				.orElseThrow(() -> new AppException("INCORRECT_LOGIN_INFO"));
 		if (!user.passwordMatches(userLogin.getPassword())) {
 			throw new AppException("INCORRECT_LOGIN_INFO");
@@ -109,7 +107,7 @@ public class UserTokenService implements OpaqueTokenIntrospector {
 	}
 
 	public UserAuth getAuthByToken(String token) {
-		UserToken userToken = userTokenRepository.findOne(QUserToken.userToken.token.eq(token))
+		UserToken userToken = userTokenRepository.findByToken(token)
 				.filter(UserToken::isValidNow)
 				.orElseThrow(() -> new AppException("INVALID_TOKEN"));
 		try {

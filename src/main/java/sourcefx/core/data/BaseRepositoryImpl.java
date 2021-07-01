@@ -41,8 +41,8 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 	private final JpaEntityInformation<T, ?> entityInformation;
 	private final EntityManager entityManager;
 	private final PathBuilder<T> path;
-	private final PathBuilder<Object> pathForId;
-	private final BooleanPath pathForDeleted;
+	private final PathBuilder<Object> pathOfId;
+	private final BooleanPath pathOfDeleted;
 	private final Querydsl querydsl;
 
 	public BaseRepositoryImpl(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
@@ -52,8 +52,8 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 		this.entityManager = entityManager;
 
 		this.path = new PathBuilderFactory().create(entityInformation.getJavaType());
-		this.pathForId = path.get(this.entityInformation.getRequiredIdAttribute().getName());
-		this.pathForDeleted = getPathForDeleted(this.path, this.entityManager);
+		this.pathOfId = path.get(this.entityInformation.getRequiredIdAttribute().getName());
+		this.pathOfDeleted = getPathForDeleted(this.path, this.entityManager);
 
 		this.querydsl = new Querydsl(entityManager, this.path);
 	}
@@ -69,7 +69,7 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 
 	@Override
 	public Optional<T> findById(ID id) {
-		return findOne(pathForId.eq(id));
+		return findOne(pathOfId.eq(id));
 	}
 
 	@Override
@@ -79,8 +79,7 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 
 	@Override
 	public Iterable<T> findAll(Predicate predicate, Sort sort) {
-		JPQLQuery<T> query = createQuery(predicate);
-		return querydsl.applySorting(sort, query).fetch();
+		return querydsl.applySorting(sort, createQuery(predicate)).fetch();
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 
 	@Override
 	public List<T> findAllById(Iterable<ID> ids) {
-		return Lists.newArrayList(findAll(pathForId.in(Lists.newArrayList(ids))));
+		return Lists.newArrayList(findAll(pathOfId.in(Lists.newArrayList(ids))));
 	}
 
 	@Override
@@ -117,7 +116,7 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 
 	@Override
 	public boolean existsById(ID id) {
-		return exists(pathForId.eq(id));
+		return exists(pathOfId.eq(id));
 	}
 
 	private JPQLQuery<T> createQuery(@Nullable Predicate predicate) {
@@ -136,8 +135,8 @@ public class BaseRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID>
 		if (predicate != null) {
 			conditions.and(predicate);
 		}
-		if (pathForDeleted != null) {
-			conditions.and(pathForDeleted.isFalse());
+		if (pathOfDeleted != null) {
+			conditions.and(pathOfDeleted.isFalse());
 		}
 		query.where(conditions);
 

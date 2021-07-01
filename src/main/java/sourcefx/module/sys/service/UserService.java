@@ -33,7 +33,7 @@ public class UserService {
 	@Transactional
 	@EventListener
 	public void onContextRefreshed(ContextRefreshedEvent event) {
-		if (!userRepository.exists(QUser.user.username.eq("root"))) {
+		if (!userRepository.existsByUsername("root")) {
 			userRepository.save(new User("root", "123456", true));
 		}
 	}

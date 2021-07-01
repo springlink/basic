@@ -40,8 +40,7 @@ public class OpenApiConfiguration {
 				.group("后台管理")
 				.pathsToMatch("/api/**")
 				.addOperationCustomizer((operation, handlerMethod) -> {
-					operation.setSecurity(Arrays.asList(
-							new SecurityRequirement().addList("user")));
+					operation.setSecurity(Arrays.asList(new SecurityRequirement().addList("user")));
 					return operation;
 				})
 				.build();
