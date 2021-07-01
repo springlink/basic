@@ -60,7 +60,7 @@ public abstract class BaseEntity implements Serializable {
 	protected void prePersist() {
 		if (id == null) {
 			LocalDateTime now = LocalDateTime.now();
-			Long userId = AppUtils.getInstance().getCurrentUserId().orElse(null);
+			Long userId = AppUtils.getCurrentUserId().orElse(null);
 			id = Snowflake.getInstance().next();
 			createdDate = now;
 			createdBy = userId;
@@ -72,7 +72,7 @@ public abstract class BaseEntity implements Serializable {
 	@PreUpdate
 	protected void preUpdate() {
 		lastModifiedDate = LocalDateTime.now();
-		lastModifiedBy = AppUtils.getInstance().getCurrentUserId().orElse(null);
+		lastModifiedBy = AppUtils.getCurrentUserId().orElse(null);
 	}
 
 	protected <T> T registerEvent(T event) {

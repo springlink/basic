@@ -28,7 +28,7 @@ public class User extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Transient
-	private final PasswordEncoder passwordEncoder = AppUtils.getInstance().getBean(PasswordEncoder.class);
+	private final PasswordEncoder passwordEncoder = AppUtils.getBean(PasswordEncoder.class);
 
 	private String username;
 

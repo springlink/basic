@@ -23,7 +23,6 @@ import sourcefx.module.sys.service.UserTokenService;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-	private final AppUtils appUtils;
 	private final UserTokenService tokenService;
 
 	@Operation(summary = "登录")
@@ -35,7 +34,7 @@ public class AuthController {
 	@Operation(summary = "授权信息")
 	@GetMapping("/info")
 	public UserAuth info() {
-		return tokenService.getAuthByToken(appUtils.getCurrentToken().get().getTokenValue());
+		return tokenService.getAuthByToken(AppUtils.getCurrentToken().get().getTokenValue());
 	}
 
 	@Operation(summary = "注销")

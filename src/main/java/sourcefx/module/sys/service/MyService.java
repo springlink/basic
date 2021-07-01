@@ -16,13 +16,12 @@ import sourcefx.module.sys.dto.my.MySetProfile;
 @Service
 @RequiredArgsConstructor
 public class MyService {
-	private final AppUtils appUtils;
 	private final UserConverter userConverter;
 	private final UserRepository userRepository;
 
 	public MyProfileReply profile() {
 		return userConverter.convertToMyProfileReply(
-				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
+				userRepository.findById(AppUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}
 
@@ -30,13 +29,13 @@ public class MyService {
 	public void setProfile(MySetProfile body) {
 		userConverter.convert(
 				body,
-				userRepository.findById(appUtils.getCurrentUserId().orElse(null))
+				userRepository.findById(AppUtils.getCurrentUserId().orElse(null))
 						.orElseThrow(AppError.ENTITY_NOT_FOUND::newException));
 	}
 
 	@Transactional
 	public void setPassword(MySetPassword body) {
-		User user = userRepository.findById(appUtils.getCurrentUserId().orElse(null))
+		User user = userRepository.findById(AppUtils.getCurrentUserId().orElse(null))
 				.orElseThrow(AppError.ENTITY_NOT_FOUND::newException);
 		if (!user.passwordMatches(body.getPassword())) {
 			throw new AppException("INCORRECT_PASSWORD");

@@ -26,7 +26,6 @@ import sourcefx.module.sys.dto.user.UserSetProfile;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-	private final AppUtils appUtils;
 	private final UserConverter userConverter;
 	private final UserRepository userRepository;
 
@@ -85,7 +84,7 @@ public class UserService {
 				bb.and(QUser.user.createdDate.loe(query.getCreatedDate()[1]));
 			}
 		}
-		appUtils.getCurrentUserId().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
+		AppUtils.getCurrentUserId().ifPresent(id -> bb.and(QUser.user.id.ne(id)));
 		bb.and(QUser.user.builtIn.isFalse());
 		return userRepository.findAll(bb, pageable).map(userConverter::convertToReply);
 	}
